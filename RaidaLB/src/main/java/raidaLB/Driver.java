@@ -15,6 +15,7 @@ public class Driver {
 
         final Scanner in = new Scanner(System.in);
         CommandManager.init();
+        System.out.println("Welcome Raida!");
         while (true) {
             final String cmd = in.nextLine();
             System.out.println(CommandManager.run(cmd));
