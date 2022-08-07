@@ -1,9 +1,9 @@
 Open in command line with "java -jar RaidaLB.jar"
 
-Commands:
+Commands:\n
 stats <ign>
-lb <raid>
-lb <class>
-lb <raid> <class>
+lb <raid>\n
+lb <class>\n
+lb <raid> <class>\n
 
 Good luck lol
