@@ -65,7 +65,7 @@ public class CommandManager {
             }
         }
 
-        return null;
+        return "Invalid command, See usage on README.MD";
 
     }
 
