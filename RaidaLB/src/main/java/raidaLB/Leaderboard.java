@@ -1,12 +1,13 @@
 package raidaLB;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import raidaLB.Raida.Raid;
 import raidaLB.Raida.WynnClass;
 
-public class Leaderboard {
-
+public class Leaderboard implements Serializable {
+    private static final long serialVersionUID = -8045090452313515439L;
     private final ArrayList<Raida> playas;
 
 

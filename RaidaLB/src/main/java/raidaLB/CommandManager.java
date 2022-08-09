@@ -11,11 +11,13 @@ public class CommandManager {
 
     private static WynncraftAPI api;
     private static Leaderboard lb;
+    private static RaidaArchive archive;
 
 
     public static void init() throws IOException {
         api = new WynncraftAPI();
-        lb = new Leaderboard(ConfigManager.loadPlayerFile(api));
+        lb = null; // TODO create LBManager
+        archive = RaidaArchive.loadArchive();
 
     }
 
@@ -40,7 +42,11 @@ public class CommandManager {
         if (command.equals("stats")) {
             if (args.length != 1)
                 return "Incorrect usage of 'stats'\nUsage: stats <ign>";
-            return (new Raida(args[0], api).summarize());
+
+            final Raida r = new Raida(args[0], api);
+            // Saves raida
+            archive.addRaida(r.getIGN(), r);
+            return r.summarize();
         }
         if (command.equals("lb")) {
             if (args.length == 1) {

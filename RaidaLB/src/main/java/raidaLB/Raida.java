@@ -1,11 +1,15 @@
 package raidaLB;
 
+import java.io.Serializable;
 import me.bed0.jWynn.WynncraftAPI;
 import me.bed0.jWynn.api.v2.player.WynncraftPlayer;
 import me.bed0.jWynn.api.v2.player.classes.WynncraftPlayerClass;
 import me.bed0.jWynn.api.v2.player.classes.WynncraftPlayerClassRaidIndividual;
 
-public class Raida {
+public class Raida implements Serializable {
+    private static final long serialVersionUID = 4389842069018687021L;
+
+
     public static enum Raid {
         notg, nol, tcc
     }
