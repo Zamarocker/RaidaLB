@@ -1,5 +1,8 @@
 .gradle
 /build/
+/RaidaConfig/
+.project
+/bin/
 
 # Ignore Gradle GUI config
 gradle-app.setting
