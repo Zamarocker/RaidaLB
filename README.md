@@ -4,6 +4,5 @@ Commands:<br />
 stats (ign)<br />
 lb (raid)<br />
 lb (class)<br />
-lb (raid) (class)<br />
 
 Good luck lol
