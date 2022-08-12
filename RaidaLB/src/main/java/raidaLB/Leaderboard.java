@@ -10,6 +10,7 @@ import raidaLB.Raida.WynnClass;
 
 public class Leaderboard implements Serializable {
     private static final long serialVersionUID = -8045090452313515439L;
+    private static final int DEFAULT_PRINT_COUNT = 20;
     private static final int LBCAP = 100;
     private final List<Raida> playas;
     private final RaidaComparator comp;
@@ -35,6 +36,10 @@ public class Leaderboard implements Serializable {
 
 
     public boolean qualifies(final Raida playa) {
+        // Players with 0 raids never qualify
+        if (playa.getRaidcount(comp.rf, comp.cf) == 0)
+            return false;
+
         // Players always qualify if the leaderboard isnt full
         if (playas.size() < LBCAP)
             return true;
@@ -52,9 +57,14 @@ public class Leaderboard implements Serializable {
 
 
     public String printLB() {
+        return printLB(0, DEFAULT_PRINT_COUNT);
+
+    }
+
+
+    public String printLB(final int min, final int max) {
         sort();
         final StringBuilder builder = new StringBuilder();
-        int count = 0;
 
         final Raid rf = comp.rf;
         final WynnClass cf = comp.cf;
@@ -64,9 +74,12 @@ public class Leaderboard implements Serializable {
             : "all raids", cf != null ? cf.toString() : "all classes");
         builder.append(header);
 
-        for (final Raida entry : playas) {
-            count++;
-            final String line = String.format("%d. %s - %d Raids\n", count,
+        // for (final Raida entry : playas) {
+
+        for (int i = min; i < Math.min(playas.size(), max); i++) {
+            final Raida entry = playas.get(i);
+
+            final String line = String.format("%d. %s - %d Raids\n", i + 1,
                 entry.getIGN(), entry.getRaidcount(rf, cf));
             builder.append(line);
         }

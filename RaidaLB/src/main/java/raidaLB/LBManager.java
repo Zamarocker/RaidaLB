@@ -10,28 +10,13 @@ import raidaLB.Raida.WynnClass;
 public class LBManager implements Serializable {
     private static final long serialVersionUID = 8451356162401470407L;
 
-    private static final String SER_NAME = "leaderboards.ser";
     private final Leaderboard allLB;
     private final Hashtable<Raid, Leaderboard> raidLbs;
     private final Hashtable<WynnClass, Leaderboard> classLbs;
 
-    // Global singular Class instance
-    private static LBManager instance;
-
 
     public static LBManager getInstance() throws IOException {
-        if (instance != null)
-            return instance;
-        instance = ConfigManager.deserialize(SER_NAME, LBManager.class);
-        if (instance != null)
-            return instance;
-        instance = new LBManager();
-        return instance;
-    }
-
-
-    public void save() throws IOException {
-        ConfigManager.serialize(SER_NAME, this);
+        return SaveManager.getInstance().getLBM();
     }
 
 
@@ -57,6 +42,7 @@ public class LBManager implements Serializable {
 
 
     public void add(final Raida playa) {
+
         if (allLB.qualifies(playa))
             allLB.add(playa);
 
