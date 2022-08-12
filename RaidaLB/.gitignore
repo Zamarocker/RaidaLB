@@ -3,6 +3,8 @@
 /RaidaConfig/
 .project
 /bin/
+/.settings/
+.classpath
 
 # Ignore Gradle GUI config
 gradle-app.setting

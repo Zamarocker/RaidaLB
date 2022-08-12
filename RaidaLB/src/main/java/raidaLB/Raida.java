@@ -57,7 +57,6 @@ public class Raida implements Serializable {
         lastRefreshed = new Timestamp(System.currentTimeMillis());
         // Asks api for updated player info
         player = getPlayer(ign, Driver.getApi());
-
         // Clear cache
         allRaids = null;
         raidCounts.clear();
@@ -66,11 +65,11 @@ public class Raida implements Serializable {
     }
 
 
-    public Raida(final WynncraftPlayer player) {
+    private Raida(final WynncraftPlayer player) {
         this.player = player;
         ign = player.getUsername();
-        raidCounts = new Hashtable<Raida.Raid, Integer>();
-        classRaidCounts = new Hashtable<Raida.WynnClass, Integer>();
+        raidCounts = new Hashtable<Raid, Integer>();
+        classRaidCounts = new Hashtable<WynnClass, Integer>();
 
     }
 
@@ -216,8 +215,7 @@ public class Raida implements Serializable {
         // Summary calls force refresh, for convenience
         forceRefresh();
         final StringBuilder builder = new StringBuilder();
-        final String format = "%s: %d\n";
-        final String formatWithPlacement = "%s: %d\t(#%d)\n";
+
         final LBManager lbm = LBManager.getInstance();
 
         // Header
@@ -232,19 +230,9 @@ public class Raida implements Serializable {
 
         for (final Raid rf : Raid.values()) {
             final int count = getRaidcount(rf);
-            // Check count, omit if zero
-            if (count != 0) {
-                final int placement = lbm.getLB(rf).placementOf(this);
-                String entry = null;
-                // Check for any leaderboard placements
-                if (placement > 0)
-                    entry = String.format(formatWithPlacement, rfToName(rf),
-                        count, placement);
-
-                else
-                    entry = String.format(format, rfToName(rf), count);
-                builder.append(entry);
-            }
+            final String raidName = rfToName(rf);
+            final Leaderboard lb = lbm.getLB(rf);
+            builder.append(generateStatLine(raidName, count, lb));
         }
 
         // by class
@@ -254,36 +242,41 @@ public class Raida implements Serializable {
         for (final WynnClass cf : WynnClass.values()) {
             final int count = getRaidcount(cf);
             final String className = cf.toString();
-            // Check count, omit if zero
-            if (count != 0) {
-                final int placement = lbm.getLB(cf).placementOf(this);
-                String entry = null;
-                // Check for any leaderboard placements
-                if (placement > 0)
-                    entry = String.format(formatWithPlacement, className, count,
-                        placement);
-                else
-                    entry = String.format(format, className, count);
-                builder.append(entry);
-            }
+            final Leaderboard lb = lbm.getLB(cf);
+            builder.append(generateStatLine(className, count, lb));
         }
 
         builder.append("\n");
         // Totals
         final int count = getRaidcount();
+        final Leaderboard lb = lbm.getLB();
+        builder.append(generateStatLine("Total", count, lb));
 
-        final int placement = lbm.getLB().placementOf(this);
-        String entry = null;
-        // Check for any leaderboard placements
-        if (placement > 0)
-            entry = String.format(formatWithPlacement, "Total", count,
-                placement);
-        else
-            entry = String.format(format, "Total", count);
-
-        builder.append(entry);
         return builder.toString();
 
+    }
+
+
+    private String generateStatLine(
+        final String prefix,
+        final int raidCount,
+        final Leaderboard lb) {
+        if (raidCount != 0) {
+
+            final String format = "%s: %d";
+            final int padding = 35;
+
+            final int placement = lb.placementOf(this);
+            String entry = String.format(format, prefix, raidCount);
+            // Check for any leaderboard placements
+            if (placement > 0) {
+                entry = String.format("%s%" + (padding - entry.length())
+                    + "s(#%d)", entry, "", placement);
+            }
+
+            return entry + "\n";
+        }
+        return "";
     }
 
 

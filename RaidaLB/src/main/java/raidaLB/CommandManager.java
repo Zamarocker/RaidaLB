@@ -2,6 +2,8 @@ package raidaLB;
 
 import java.io.IOException;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import me.bed0.jWynn.exceptions.APIRequestException;
 import raidaLB.Raida.Raid;
 import raidaLB.Raida.WynnClass;
 
@@ -29,10 +31,24 @@ public class CommandManager {
     public static String run(final String command, final String[] args)
         throws IOException {
 
-        if (command.equals("stats")) {
-            if (args.length != 1)
-                return "Incorrect usage of 'stats'\nUsage: stats <ign>";
+        if (command.equals("stats"))
+            return stats(args);
 
+        if (command.equals("lb"))
+            return lb(args);
+
+        if (command.equals("quit") && args.length == 0)
+            Driver.exit();
+        return "Invalid command, See usage on README.MD";
+
+    }
+
+
+    private static String stats(final String[] args) throws IOException {
+        if (args.length != 1)
+            return "Incorrect usage of 'stats'\nUsage: stats <ign>";
+
+        try {
             final String ign = args[0];
             Raida playa = null;
             if (archive.contains(ign))
@@ -44,26 +60,48 @@ public class CommandManager {
             lbm.add(playa);
             return playa.summarize();
         }
-        if (command.equals("lb")) {
-            if (args.length == 0) {
-                return lbm.getLB().printLB();
-            }
-            if (args.length == 1) {
-                // arg is raid
-                if (EnumUtils.isValidEnum(Raid.class, args[0]))
-                    return lbm.getLB(Raid.valueOf(args[0])).printLB();
-                // arg is class
-                if (EnumUtils.isValidEnum(WynnClass.class, args[0]))
-                    return lbm.getLB(WynnClass.valueOf(args[0])).printLB();
-                else
-                    return "Incorrect usage of 'lb'\nUsage: lb <raid>/<class>";
-            }
+        catch (final APIRequestException e) {
+            return "Invalid Username";
+        }
+    }
+
+
+    private static String lb(final String[] args) {
+        if (args.length == 0) {
+            return lbm.getLB().printLB();
         }
 
-        if (command.equals("quit") && args.length == 0)
-            Driver.exit();
+        Leaderboard lb = null;
+        // arg is raid
+        if (EnumUtils.isValidEnum(Raid.class, args[0]))
+            lb = lbm.getLB(Raid.valueOf(args[0]));
+        // arg is class
+        else if (EnumUtils.isValidEnum(WynnClass.class, args[0]))
+            lb = lbm.getLB(WynnClass.valueOf(args[0]));
+        else if (args[0].equalsIgnoreCase("all"))
+            lb = lbm.getLB();
+        else
+            return "Incorrect usage of 'lb'\nUsage: lb <raid>/<class>";
 
-        return "Invalid command, See usage on README.MD";
+        // lb <raid>/<class>
+        if (args.length == 1)
+            return lb.printLB();
+
+        // lb <raid>/<class> max
+        else if (args.length == 2 && NumberUtils.isCreatable(args[1])) {
+            final int max = Integer.parseInt(args[1]);
+            return lb.printLB(0, max);
+        }
+
+        // lb <raid>/<class> min max
+        else if (args.length == 3 && NumberUtils.isCreatable(args[1])
+            && NumberUtils.isCreatable(args[2])) {
+            final int min = Integer.parseInt(args[1]);
+            final int max = Integer.parseInt(args[2]);
+            return lb.printLB(min, max);
+        }
+        else
+            return "Invalid arguments of 'lb'\nUsage: \nlb <raid>/<class> (max)\nlb <raid>/<class> (min) (max)";
 
     }
 
