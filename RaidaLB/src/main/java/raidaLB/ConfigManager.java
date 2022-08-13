@@ -7,11 +7,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+/**
+ *
+ *
+ */
 public class ConfigManager {
     public static final String CONFIG_FOLDER_NAME = "RaidaConfig";
     public static final String PLAYER_FILE_NAME = "igns.txt";
 
 
+    /**
+     * Checks for existence of config folder, creates it if missing
+     */
     public static void confirmConfigFolder() {
         final File folder = new File(CONFIG_FOLDER_NAME);
         if (!folder.exists()) {
@@ -20,6 +27,19 @@ public class ConfigManager {
     }
 
 
+    /**
+     * Deserializes a saved object
+     *
+     * @param <T>
+     *            object type
+     * @param fileName
+     *            Name of file
+     * @param c
+     *            class of object
+     * @return
+     *         Deserialized object
+     * @throws IOException
+     */
     @SuppressWarnings("unchecked")
     public static <T> T deserialize(final String fileName, final Class<T> c)
         throws IOException {
@@ -45,6 +65,15 @@ public class ConfigManager {
     }
 
 
+    /**
+     * Serializes and saves an object to disk
+     * 
+     * @param fileName
+     *            Name of file
+     * @param obj
+     *            Object type
+     * @throws IOException
+     */
     public static void serialize(final String fileName, final Object obj)
         throws IOException {
         ConfigManager.confirmConfigFolder();

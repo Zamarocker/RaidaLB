@@ -7,6 +7,9 @@ import raidaLB.Leaderboard.RaidaComparator;
 import raidaLB.Raida.Raid;
 import raidaLB.Raida.WynnClass;
 
+/**
+ * A class to provide easy access to all leaderboards
+ */
 public class LBManager implements Serializable {
     private static final long serialVersionUID = 8451356162401470407L;
 
@@ -15,11 +18,21 @@ public class LBManager implements Serializable {
     private final Hashtable<WynnClass, Leaderboard> classLbs;
 
 
+    /**
+     * Gets the current LBManager instance
+     *
+     * @return
+     *         This program's LBManager instance
+     * @throws IOException
+     */
     public static LBManager getInstance() throws IOException {
         return SaveManager.getInstance().getLBM();
     }
 
 
+    /**
+     * Constructs a new LBManager
+     */
     public LBManager() {
 
         // Creates All raid leaderboard
@@ -41,6 +54,11 @@ public class LBManager implements Serializable {
     }
 
 
+    /**
+     * Attempts to add Raida to all existing leaderboards
+     * 
+     * @param playa
+     */
     public void add(final Raida playa) {
 
         if (allLB.qualifies(playa))
@@ -59,16 +77,36 @@ public class LBManager implements Serializable {
     }
 
 
+    /**
+     * Get the all raids leaderboard
+     * 
+     * @return
+     *         all Leaderboard
+     */
     public Leaderboard getLB() {
         return allLB;
     }
 
 
+    /**
+     * Get a raid leaderboard by filter
+     * 
+     * @param rf
+     * @return
+     *         raid Leaderboard
+     */
     public Leaderboard getLB(final Raid rf) {
         return raidLbs.get(rf);
     }
 
 
+    /**
+     * Get a class leaderboard by filter
+     * 
+     * @param cf
+     * @return
+     *         class Leaderboard
+     */
     public Leaderboard getLB(final WynnClass cf) {
         return classLbs.get(cf);
     }

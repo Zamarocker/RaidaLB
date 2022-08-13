@@ -9,6 +9,10 @@ import me.bed0.jWynn.api.v2.player.WynncraftPlayer;
 import me.bed0.jWynn.api.v2.player.classes.WynncraftPlayerClass;
 import me.bed0.jWynn.api.v2.player.classes.WynncraftPlayerClassRaidIndividual;
 
+/**
+ *
+ *
+ */
 public class Raida implements Serializable {
     private static final long serialVersionUID = 4389842069018687021L;
 
@@ -21,10 +25,6 @@ public class Raida implements Serializable {
     public static enum WynnClass {
         warrior, archer, mage, assassin, shaman
     }
-
-    public static final String NOTG_NAME = "Nest of the Grootslangs";
-    public static final String NOL_NAME = "Orphion's Nexus of Light";
-    public static final String TCC_NAME = "The Canyon Colossus";
 
     // minimum time before refresh, can be bypassed with forceRefresh()
     private static final long REFRESH_CD = (15L * 60L * 1000L);
@@ -42,6 +42,9 @@ public class Raida implements Serializable {
     private transient WynncraftPlayer player;
 
 
+    /**
+     * Refreshes this Raida if its refresh is off cooldown
+     */
     public void refresh() {
 
         // Check cooldown, or existence of player object (null on program
@@ -53,6 +56,9 @@ public class Raida implements Serializable {
     }
 
 
+    /**
+     * Refreshes this Raida regardless of cooldown
+     */
     public void forceRefresh() {
         lastRefreshed = new Timestamp(System.currentTimeMillis());
         // Asks api for updated player info
@@ -65,6 +71,11 @@ public class Raida implements Serializable {
     }
 
 
+    /**
+     * Raida Constructor
+     *
+     * @param player
+     */
     private Raida(final WynncraftPlayer player) {
         this.player = player;
         ign = player.getUsername();
@@ -74,16 +85,33 @@ public class Raida implements Serializable {
     }
 
 
+    /**
+     * Raida Constructor
+     *
+     * @param ign
+     */
     public Raida(final String ign) {
         this(getPlayer(ign, Driver.getApi()));
     }
 
 
+    /**
+     * Gets IGN
+     *
+     * @return
+     *         IGN
+     */
     public String getIGN() {
         return ign;
     }
 
 
+    /**
+     * Gets Total Raidcount for this Raida
+     *
+     * @return
+     *         raidcount
+     */
     public int getRaidcount() {
         if (allRaids != null)
             return allRaids;
@@ -92,6 +120,13 @@ public class Raida implements Serializable {
     }
 
 
+    /**
+     * Gets Raidcount filtered by raid for this Raida
+     *
+     * @param rf
+     * @return
+     *         raidcount
+     */
     public int getRaidcount(final Raid rf) {
         Integer count = raidCounts.get(rf);
         if (count != null)
@@ -102,6 +137,13 @@ public class Raida implements Serializable {
     }
 
 
+    /**
+     * Gets Raidcount filtered by class for this Raida
+     *
+     * @param cf
+     * @return
+     *         raidcount
+     */
     public int getRaidcount(final WynnClass cf) {
         Integer count = classRaidCounts.get(cf);
         if (count != null)
@@ -112,6 +154,14 @@ public class Raida implements Serializable {
     }
 
 
+    /**
+     * Gets Raidcount, given filters, for this Raida
+     *
+     * @param rf
+     * @param cf
+     * @return
+     *         raidcount
+     */
     public int getRaidcount(final Raid rf, final WynnClass cf) {
         // Appropriate methods used when possible
 
@@ -126,25 +176,36 @@ public class Raida implements Serializable {
     }
 
 
+    /**
+     * Calculates raidcount, given filters, for this Raida
+     *
+     * @param rf
+     * @param cf
+     * @return
+     */
     private int calcRaidcount(final Raid rf, final WynnClass cf) {
         refresh();
         int sum = 0;
 
-        // for each class on account:
+        // for each character profile on account:
         for (final WynncraftPlayerClass character : player.getClasses()) {
             // Filter class if provided
             if (cf == null || WynnClass.valueOf(getBaseClass(character)).equals(
                 cf))
-                // Get raidcount
-                sum += getClassRaidCount(character, rf);
+                // Get raidcount for the character profile
+                sum += getCharacterRaidCount(character, rf);
 
         }
         return sum;
     }
 
 
-    /*
-     * This exists because He forgor skyseer reskin
+    /**
+     * This exists because Bolyai forgor skyseer reskin
+     *
+     * @param character
+     * @return
+     *         className
      */
     private static String getBaseClass(final WynncraftPlayerClass character) {
         final String replacedName = character.getName().replaceAll("\\d", "");
@@ -166,7 +227,15 @@ public class Raida implements Serializable {
     }
 
 
-    private static int getClassRaidCount(
+    /**
+     * Gets raidcount for a character profile, can filter by raid
+     *
+     * @param character
+     * @param rf
+     * @return
+     *         character raidcount
+     */
+    private static int getCharacterRaidCount(
         final WynncraftPlayerClass character,
         final Raid rf) {
 
@@ -178,7 +247,7 @@ public class Raida implements Serializable {
         // Otherwise match full raid name to provided filter
         final WynncraftPlayerClassRaidIndividual[] list = character.getRaids()
             .getList();
-        final String raidName = rfToName(rf);
+        final String raidName = Formatter.rfToName(rf);
 
         // Finds count of specified raid, if it exists
         // Returns 0 if not found
@@ -190,20 +259,14 @@ public class Raida implements Serializable {
     }
 
 
-    private static String rfToName(final Raid rf) {
-        switch (rf) {
-            case nol:
-                return NOL_NAME;
-            case notg:
-                return NOTG_NAME;
-            case tcc:
-                return TCC_NAME;
-
-        }
-        return null;
-    }
-
-
+    /**
+     * Queries wynn api given an IGN
+     *
+     * @param ign
+     * @param api
+     * @return
+     *         WynncraftPlayer object
+     */
     public static WynncraftPlayer getPlayer(
         final String ign,
         final WynncraftAPI api) {
@@ -211,6 +274,13 @@ public class Raida implements Serializable {
     }
 
 
+    /**
+     * Creates a detailed summary string for this Raida
+     *
+     * @return
+     *         Summary String
+     * @throws IOException
+     */
     public String summarize() throws IOException {
         // Summary calls force refresh, for convenience
         forceRefresh();
@@ -230,7 +300,7 @@ public class Raida implements Serializable {
 
         for (final Raid rf : Raid.values()) {
             final int count = getRaidcount(rf);
-            final String raidName = rfToName(rf);
+            final String raidName = Formatter.rfToName(rf);
             final Leaderboard lb = lbm.getLB(rf);
             builder.append(generateStatLine(raidName, count, lb));
         }
@@ -241,7 +311,7 @@ public class Raida implements Serializable {
         builder.append("By class: \n");
         for (final WynnClass cf : WynnClass.values()) {
             final int count = getRaidcount(cf);
-            final String className = cf.toString();
+            final String className = Formatter.capitalize(cf.toString());
             final Leaderboard lb = lbm.getLB(cf);
             builder.append(generateStatLine(className, count, lb));
         }
@@ -257,6 +327,15 @@ public class Raida implements Serializable {
     }
 
 
+    /**
+     * Helper function for summarize, creates one of the lines representing a
+     * stat
+     *
+     * @param prefix
+     * @param raidCount
+     * @param lb
+     * @return
+     */
     private String generateStatLine(
         final String prefix,
         final int raidCount,
