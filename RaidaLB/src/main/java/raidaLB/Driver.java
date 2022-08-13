@@ -6,12 +6,21 @@ import java.util.Timer;
 import java.util.TimerTask;
 import me.bed0.jWynn.WynncraftAPI;
 
+/**
+ * Driver class containing main method
+ *
+ */
 public class Driver {
 
     public static boolean debugMode;
     private static WynncraftAPI api;
 
 
+    /**
+     * Main method
+     * 
+     * @param args
+     */
     public static void main(final String[] args) {
 
         try {
@@ -28,13 +37,12 @@ public class Driver {
                         SaveManager.getInstance().save();
                     }
                     catch (final IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }
             };
 
-            // schedule the task to run starting now and then every hour...
+            // schedule the save task to run every hour
             timer.schedule(saveTask, 0l, 1000 * 60 * 60);
 
             System.out.println("Welcome Raida!");
@@ -73,11 +81,22 @@ public class Driver {
     }
 
 
+    /**
+     * Gets the WynncraftAPI instance for the running program
+     *
+     * @return api
+     *
+     */
     public static WynncraftAPI getApi() {
         return api;
     }
 
 
+    /**
+     * Exit function, saves and exits
+     *
+     * @throws IOException
+     */
     public static void exit() throws IOException {
 
         SaveManager.getInstance().save();

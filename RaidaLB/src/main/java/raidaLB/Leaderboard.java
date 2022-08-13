@@ -8,6 +8,9 @@ import java.util.List;
 import raidaLB.Raida.Raid;
 import raidaLB.Raida.WynnClass;
 
+/**
+ * Object to represent a raid Leaderboard
+ */
 public class Leaderboard implements Serializable {
     private static final long serialVersionUID = -8045090452313515439L;
     private static final int DEFAULT_PRINT_COUNT = 20;
@@ -16,12 +19,23 @@ public class Leaderboard implements Serializable {
     private final RaidaComparator comp;
 
 
+    /**
+     * Creates a new leaderboard object
+     *
+     * @param comparator
+     *            RaidaComparator param to dictate how this leaderboard sorts
+     */
     public Leaderboard(final RaidaComparator comparator) {
         playas = new ArrayList<Raida>();
         comp = comparator;
     }
 
 
+    /**
+     * Adds a Raida to this leaderboard, if they dont exist
+     *
+     * @param playa
+     */
     public void add(final Raida playa) {
         if (!playas.contains(playa)) {
             playas.add(playa);
@@ -35,6 +49,14 @@ public class Leaderboard implements Serializable {
     }
 
 
+    /**
+     * Checks if a Raida qualifies for this leaderboard, checking various
+     * conditions
+     *
+     * @param playa
+     * @return
+     *         if qualifies
+     */
     public boolean qualifies(final Raida playa) {
         // Players with 0 raids never qualify
         if (playa.getRaidcount(comp.rf, comp.cf) == 0)
@@ -51,17 +73,38 @@ public class Leaderboard implements Serializable {
     }
 
 
+    /**
+     * Returns the leaderboard placement/position of the provided Raida
+     *
+     * @param playa
+     * @return
+     *         leaderboard position
+     */
     public int placementOf(final Raida playa) {
         return playas.indexOf(playa) + 1;
     }
 
 
+    /**
+     * Prints the leaderboard with default range
+     *
+     * @return
+     *         Formatted String Leaderboard Summary
+     */
     public String printLB() {
         return printLB(0, DEFAULT_PRINT_COUNT);
 
     }
 
 
+    /**
+     * Prints the leaderboard given a range
+     *
+     * @param min
+     * @param max
+     * @return
+     *         Formatted String Leaderboard Summary
+     */
     public String printLB(final int min, final int max) {
         sort();
         final StringBuilder builder = new StringBuilder();
@@ -69,12 +112,26 @@ public class Leaderboard implements Serializable {
         final Raid rf = comp.rf;
         final WynnClass cf = comp.cf;
 
-        final String header = String.format("%s, %s Leaderboard\n", rf != null
-            ? rf.toString()
-            : "all raids", cf != null ? cf.toString() : "all classes");
-        builder.append(header);
+        String header = null;
 
-        // for (final Raida entry : playas) {
+        // No filter header
+        if (rf == null && cf == null)
+            header = "Total Leaderboard";
+        // Raid filter header
+        else if (rf != null && cf == null)
+            header = String.format("%s Leaderboard\n", rf.toString()
+                .toUpperCase());
+        // Class filter header
+        else if (rf == null && cf != null)
+            header = String.format("%s Leaderboard\n", Formatter.capitalize(cf
+                .toString()));
+        // Unused (both filter) header
+        else
+            header = String.format("%s, %s Leaderboard\n", rf != null
+                ? rf.toString()
+                : "All raids", cf != null ? cf.toString() : "All classes");
+
+        builder.append(header);
 
         for (int i = min; i < Math.min(playas.size(), max); i++) {
             final Raida entry = playas.get(i);
@@ -88,6 +145,9 @@ public class Leaderboard implements Serializable {
     }
 
 
+    /**
+     * Sorts the leaderboard by its comparator
+     */
     private void sort() {
         Collections.sort(playas, comp);
 

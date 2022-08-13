@@ -7,11 +7,17 @@ import me.bed0.jWynn.exceptions.APIRequestException;
 import raidaLB.Raida.Raid;
 import raidaLB.Raida.WynnClass;
 
+/**
+ * Class for processing commands
+ */
 public class CommandManager {
     private static RaidaArchive archive;
     private static LBManager lbm;
 
 
+    /**
+     * @throws IOException
+     */
     public static void init() throws IOException {
         lbm = LBManager.getInstance();
         archive = RaidaArchive.getInstance();
@@ -28,6 +34,15 @@ public class CommandManager {
  * quit
  *
  */
+    /**
+     * Run a command
+     * 
+     * @param command
+     * @param args
+     * @return
+     *         command output
+     * @throws IOException
+     */
     public static String run(final String command, final String[] args)
         throws IOException {
 
@@ -44,6 +59,14 @@ public class CommandManager {
     }
 
 
+    /**
+     * Helper function to process the stats command
+     * 
+     * @param args
+     * @return
+     *         stats command output
+     * @throws IOException
+     */
     private static String stats(final String[] args) throws IOException {
         if (args.length != 1)
             return "Incorrect usage of 'stats'\nUsage: stats <ign>";
@@ -66,6 +89,13 @@ public class CommandManager {
     }
 
 
+    /**
+     * Helper function to process the leaderboard command
+     * 
+     * @param args
+     * @return
+     *         lb command output
+     */
     private static String lb(final String[] args) {
         if (args.length == 0) {
             return lbm.getLB().printLB();
